@@ -1,6 +1,7 @@
 const express = require("express");
 const invent_route = express.Router();
 const Inventory = require("./inventory.js")
+
 invent_route.post("/createInventory", async (req, res)=>{
     try{
         const data = await Inventory.find()
