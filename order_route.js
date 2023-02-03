@@ -8,16 +8,22 @@ order_routes.post("/createOrders", async (req, res) => {
     try {
         const inventory = await Inventory.findOne({item_name:req.body.Item_name});
         const customer = await Customer.find();
-        const orders = await OrderModel.create({
-            customer_id:customer[customer.length-1].customer_id,
-            Inventory_id:inventory.inventory_id,
-            Item_name:req.body.Item_name,
-            quantity:req.body.quantity
-        })
-        res.status(200).json({
-            status: "Success",
-            orders
-        })
+        if(inventory.available >= req.body.quantity){
+            const orders = await OrderModel.create({
+                customer_id:customer[customer.length-1].customer_id,
+                Inventory_id:inventory.inventory_id,
+                Item_name:req.body.Item_name,
+                quantity:req.body.quantity
+            });
+            res.status(200).json({
+                status: "Success",
+                orders
+            })
+        }else{
+            res.json({
+                status:"Orders out of stock"
+            })
+        }
     } catch (e) {
         res.status(400).json({
             status: "Failed",
@@ -36,7 +42,7 @@ order_routes.get("/orders", async (req, res) => {
         const updated = await inventory_item.updateOne({
                 available:inventory_item.available - Orders[Orders.length-1].quantity
             })
-            // console.log(updated);
+            console.log(updated);
             res.status(200).json({
                 status: "Orders Successfully",
             })
